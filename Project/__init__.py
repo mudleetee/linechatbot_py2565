@@ -26,7 +26,7 @@ def show_Excel_openpyxl():
     # data = tuple_to_str(aa)
     # data = list_to_str(aa)
     # ss = "แควอ้อม ม.8"
-    ss = "อัมพวา"
+    ss = "บาง"
     # data = openpy_630422(ss)
     data = openpy_641008(ss)
     return render_template('excel.html', data=data)
