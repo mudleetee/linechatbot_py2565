@@ -26,7 +26,7 @@ def show_Excel_openpyxl():
     # data = tuple_to_str(aa)
     # data = list_to_str(aa)
     # ss = "แควอ้อม ม.8"
-    ss = "บาง"
+    ss = "นาย"
     # data = openpy_630422(ss)
     data = openpy_641008(ss)
     return render_template('excel.html', data=data)
@@ -69,6 +69,14 @@ def webhook():
         cc = {
             "type": "text",
             "text": "(256555)นายสมชาย น้อยเอี่ยม work from home ที่ เอกชัยแมนชั่น ถ.เอกชัย ต.แม่กลอง อ.เมือง สมุทรสงคราม"
+        }
+        no = {
+            "type": "text",
+            "text": "ไม่พบข้อมูล"
+        }
+        over = {
+            "type": "text",
+            "text": "ข้อมูลที่พบมีมากกว่า 30 รายการ กรุณาเพิ่มรายละเอียด"
         }
 
         dd = {
@@ -141,15 +149,21 @@ def webhook():
             ReplyMessage(Reply_token, Reply_messasge, Channel_access_token)
         else:
             # data = openpy_630422(message)
-            data = openpy_641008(message)
+            # data = openpy_641008(message)
+            data = openpy_641109(message)
             if data == 1:
                 # data = demo_reader_jsonfile_todict()
-                data = cc
+                # data = cc
+                data = no
+            if data == 2:
+                # data = demo_reader_jsonfile_todict()
+                # data = cc
+                data = over
 
             Reply_messasge = data
             print('Data in webhook Function:')
-            print(Reply_messasge)
-            print('data_type:')
+            # print(Reply_messasge)
+            # print('data_type:')
             print(type(Reply_messasge))
             print()
             ReplyMessage(Reply_token, Reply_messasge, Channel_access_token)
@@ -170,9 +184,9 @@ def ReplyMessage(Reply_token, TextMessage, Line_Acees_Token):
 
     Authorization = 'Bearer {}'.format(Line_Acees_Token)  # ที่ยาวๆ
     print('Data(TextMessage) in ReplyMeassage Function')
-    print(TextMessage)
-    print('data_type:')
-    print(type(TextMessage))
+    # print(TextMessage)
+    # print('data_type:')
+    # print(type(TextMessage))
     print()
     print(Authorization)
     print()
@@ -372,6 +386,97 @@ def openpy(wanted):
 ###############################################################
 ############################---new--###############################
 
+def openpy_641109(wanted):
+    print(wanted)
+    print(type(wanted))
+    print()
+    wb = load_workbook('./Project/assign_numbering.xlsx')
+    # Get a sheet by name
+    sheet = wb.get_sheet_by_name('6301')
+    data = sheet.values
+    # print(data)
+    # print(len(data))
+    # print(type(data))
+    # data_islice = [r[5:10] for r in islice(data, 1)]
+    # print('///////IN----islice-------')
+    # print(data_islice)
+    # print(type(data_islice))
+    # print()
+    # print('///////Exit----islice-------')
+    # print()
+    # data_islice = list_to_tuple(data_islice)
+    # print()
+    # data_islice = tuple_to_str(data_islice)
+    # print()
+    # print()
+    # print('//////Exit----islice All Tranform-------')
+    # print()
+
+    # Convert your data to a list(inside = tuple)
+    data = list(data)
+    print('data after turn to list')
+    # print(data)
+    print(len(data))
+    print(type(data))
+    print()
+
+    # idx = [r[5] for r in data]
+    # print(idx)
+
+    # print(len(idx))
+    # print(type(idx))
+    # print()
+    print("*"*30)
+    data_net1 = []
+    data_net2 = []
+    data_net3 = []
+    data_net4 = []
+    data_net5 = []
+    for i in range(0, len(data)):  # last not included
+        if data[i][8].find(wanted) != -1:
+            data_net1.append(data[i][8])
+            data_net2.append(data[i][21])
+            data_net3.append(data[i][23])
+            data_net4.append(data[i][25])
+            data_net5.append(data[i][26])
+
+        # print('***************** End data_net Loop ', i+1, ' = ', data[i][8],'***********************')
+        # print()
+        # print(data_net1)
+        # print(type(data_net1))
+        # print()
+    print('LEN of Data_net1:')
+    print(len(data_net1))
+    if len(data_net1) > 0 and len(data_net1) <= 30:
+        print()
+        # data = list_to_tuple_to_string(data_net) #important function
+        d_som=""
+        for i in range(0, len(data_net1)):
+            d1="ลูกค้า = "+str(data_net1[i])+"\r\n"
+            d2="ACC = "+str(data_net2[i])+"\r\n"
+            d3="โปรโมชั่น = "+str(data_net3[i])+"\r\n"
+            d4="ความเร็ว = "+str(data_net4[i])+"\r\n"
+            d5="ราคา = "+str(data_net5[i])+" บาท\r\n"
+
+            be="***ข้อมูลที่ "+str((i+1))+"***\r\n"
+
+            d_som=d_som+be+d1+d2+d3+d4+d5+"\r\n"
+        # for r in data_net:
+        #     dd="ชุมสาย--"+r+"\r\n"
+        #     d_som=d_som+dd
+        # data = data_islice+"\n"+d_som
+        data = "ข้อมูล["+wanted+"]มีทั้งหมด "+str(len(data_net1))+" รายการ\r\n" + d_som
+        print('Summary Data in openpy_641109 Function:')
+        # print(data)
+        # print(type(data))
+        # print()
+    elif len(data_net1) > 30:
+        data = 2
+    else:
+        data = 1
+
+    return data
+###############################################################----------------------------------------------------
 def openpy_641008(wanted):
     print(wanted)
     print(type(wanted))
@@ -453,7 +558,7 @@ def openpy_641008(wanted):
         #     d_som=d_som+dd
         # data = data_islice+"\n"+d_som
         data = "ข้อมูล["+wanted+"]มีทั้งหมด "+str(len(data_net1))+" รายการ\r\n" + d_som
-        print('Summary Data in openpy_630422 Function:')
+        print('Summary Data in openpy_641008 Function:')
         print(data)
         print(type(data))
         print()
@@ -462,9 +567,6 @@ def openpy_641008(wanted):
 
     return data
 ###############################################################
-
-
-
 
 def openpy_630422(wanted):
     print(wanted)
